@@ -157,3 +157,12 @@ saveRDS(RT_data_word_filtered, "Output/ELP-single-trial.rds")
 write.csv(RT_data_word_filtered, "Output/ELP-single-trial.csv")
 
 
+## process and save mRT data
+
+mRT_data <- RT_data_word_filtered %>% 
+  group_by(word) %>% 
+  summarise(mRT = mean(RT))
+
+saveRDS(mRT_data, "Output/ELP.rds")
+write.csv(mRT_data, "Output/ELP.csv")
+
