@@ -4,8 +4,6 @@ rm(list=ls())
 
 library(tidyverse)
 
-
-
 skip_list = c("9999.LDT", "793DATA.LDT", "Data999.LDT", "Data1000.LDT", 
               "Data1010.LDT", "Data1016.LDT")
 
@@ -148,13 +146,13 @@ participants_to_remove <- c(participants_to_remove_acc, participants_to_remove_o
 
 
 RT_data_word_filtered <- RT_data_word %>% 
-  filter(!(ID %in% participants_to_remove))
+  filter(!(ID %in% participants_to_remove), RT > RT_minimum, RT < RT_maximum)
 
 
 ## Save cleaned individual level data as ELP-single-trial
 
-saveRDS(RT_data_word_filtered, "Output/ELP-single-trial.rds")
-write.csv(RT_data_word_filtered, "Output/ELP-single-trial.csv")
+saveRDS(RT_data_word_filtered, "Output/ELP_single_trial.rds")
+write.csv(RT_data_word_filtered, "Output/ELP_single_trial.csv")
 
 
 ## process and save mRT data
