@@ -43,7 +43,6 @@ correct_date_vec <- Vectorize(correct_date, vectorize.args = "date_in")
 
 part_data <- function(fn){
   print(paste0("Reading ... ", fn))
-  
   trial_data <- read_lines(paste0(ELP_raw_dir, fn))
   
   # Get demographic information from bottom of file. We can work on this later.
@@ -82,7 +81,9 @@ part_data <- function(fn){
                                                     unique_DOB = unique(DOB) %>% length(),
                                                     unique_Education = unique(Education) %>% length())
   
-  session_info <- session_info %>% mutate(unique = if_else(session_info_unique %>% filter(if_any(everything(), ~ .x != 1)) %>% nrow() == nrow(session_info_unique), FALSE, TRUE))
+  session_info <- session_info %>% 
+    mutate(unique = if_else(session_info_unique %>% filter(if_any(everything(), ~ .x != 1)) %>% 
+                              nrow() == nrow(session_info_unique), FALSE, TRUE))
   
   RT_data <- trial_data[-c(session_header_index, min(dem_info_index):length(trial_data))] %>% 
     as_tibble() %>% 
@@ -92,7 +93,9 @@ part_data <- function(fn){
            Univ = session_info$Univ[1],
            DOB = session_info$DOB[1],
            Education = session_info$Education[1], .before = trial) %>% 
-    mutate(across(c(ID,Univ,DOB, trial,item,type), as.factor), across(c(Education, acc, RT), as.numeric))
+    mutate(across(c(ID,Univ,DOB, trial,item,type), as.factor), across(c(Education, acc, RT), as.numeric)) %>% 
+    filter(acc %in% c(0,1))
+  
   
   return(lst(session_info, RT_data))
 }
@@ -103,24 +106,19 @@ part_data_list <- map(part_file_list_filter, ~part_data(.x))
 RT_data <- map(part_data_list, ~ .x %>% `[[`("RT_data")) %>% 
   bind_rows()
 
-session_info <-  map(part_data_list, ~ .x %>% `[[`("session_info")) %>% 
-  bind_rows()
+if(!dir.exists("Output/")) dir.create("Output/")
 
-non_unqiue_session_info <- session_info %>% filter(unique == "FALSE")
-
-
-non_unqiue_summary <- non_unqiue_session_info %>% group_by(Subject) %>% 
-  summarise(N_DOB = unique(DOB) %>% length(),
-            diff_Education = abs(diff(as.numeric(Education))))
-
-non_unique_count <- non_unqiue_summary %>% count(N_DOB, diff_Education)
-print(non_unique_count)
+saveRDS(RT_data, "Output/ELP_individual_level.rds")
+write.csv(RT_data, "Output/ELP_individual_level.csv")
 
 
-mean_RT <- RT_data %>% 
-  filter(type == 1) %>% 
-  group_by(word) %>% 
-  summarise(I_Mean_RT_trial = mean(RT)) %>% 
-  right_join(ELP_original %>% select(Word, I_Mean_RT) %>% filter(!is.na(I_Mean_RT)) %>% rename(I_Mean_RT_mean = I_Mean_RT), by=c("word"="Word")) %>% 
-  mutate(diff_RT = I_Mean_RT_mean - I_Mean_RT_trial,
-         log_diff_RT = sign(diff_RT)*log10(abs(diff_RT)+1))
+## Now filter and remove any non-words and clean the individual level data
+
+RT_data_eword <- RT_data %>% filter(type == 1)
+
+
+participant_accuracy <- RT_data_eword %>% 
+  group_by(ID) %>% 
+  summarise(accuracy = mean(acc))
+
+
