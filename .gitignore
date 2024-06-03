@@ -4,5 +4,8 @@
 .Ruserdata
 
 
-Output/
+Output/ELP_individual_level.csv
+Output/ELP_single_trial.csv
+Output/ELP.csv
+
 README.html
