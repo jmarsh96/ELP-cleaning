@@ -111,12 +111,8 @@ write.csv(RT_data, "Output/ELP_individual_level.csv")
 
 
 ## Now filter and remove any non-words and clean the individual level data
-
-## Here RT_data_word denotes RT data for english words (exlcude all non words) that were accurate
-RT_data_word <- RT_data %>% filter(type == 1, acc == 1)
-
-
-participant_accuracy <- RT_data_word %>% 
+participant_accuracy <- RT_data %>%
+  filter(type == 1) %>% 
   group_by(ID) %>% 
   summarise(accuracy = mean(acc))
 
@@ -134,7 +130,8 @@ RT_maximum <- 2000
 ## Threshold of OOR observations before the individual is excluded
 exclude_prop <- 0.2
 
-participants_to_remove_oor <- RT_data_word %>% 
+participants_to_remove_oor <- RT_data %>%
+  filter(type == 1, acc == 1) %>% 
   group_by(ID) %>% 
   summarise(prop_oor = mean(RT < RT_minimum | RT > RT_maximum)) %>% 
   filter(prop_oor > exclude_prop) %>% 
@@ -145,8 +142,9 @@ participants_to_remove <- c(participants_to_remove_acc, participants_to_remove_o
   as.numeric()
 
 
-RT_data_word_filtered <- RT_data_word %>% 
-  filter(!(ID %in% participants_to_remove), RT > RT_minimum, RT < RT_maximum)
+RT_data_word_filtered <- RT_data %>% 
+  filter(type == 1, acc == 1,!(ID %in% participants_to_remove), RT > RT_minimum, 
+         RT < RT_maximum)
 
 
 ## Save cleaned individual level data as ELP-single-trial
