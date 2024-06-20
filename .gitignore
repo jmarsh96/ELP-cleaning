@@ -8,4 +8,6 @@ Output/ELP_individual_level.csv
 Output/ELP_single_trial.csv
 Output/ELP.csv
 
+blp_raw/
+
 README.html
