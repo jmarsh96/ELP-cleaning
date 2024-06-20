@@ -162,3 +162,63 @@ mRT_data <- RT_data_word_filtered %>%
 saveRDS(mRT_data, "Output/ELP.rds")
 write.csv(mRT_data, "Output/ELP.csv")
 
+
+####
+#### now clean BLP data using same process
+####
+
+
+RT_data_BLP <- read.delim("blp_raw/blp-trials.txt",sep="\t") %>% 
+  select(participant, lexicality, accuracy, rt.raw, spelling) %>% 
+  rename(ID = participant, type = lexicality, acc = accuracy, RT = rt.raw, word = spelling) %>% 
+  mutate(across(c(acc, RT), as.numeric),
+         type = factor(type, labels=c(0,1)),
+         ID = as.factor(ID))
+
+
+
+## Now filter and remove any non-words and clean the individual level data
+participant_accuracy <- RT_data_BLP %>%
+  filter(type == 1) %>% 
+  group_by(ID) %>% 
+  summarise(accuracy = mean(acc))
+
+## Remove all participants with an accuracy lower than the threshold
+participants_to_remove_acc <- participant_accuracy %>% 
+  filter(accuracy < accuracy_threshold) %>% 
+  pull(ID)
+
+## Remove all participants that have a high proporportion of out-of-range (OOR) responses
+RT_minimum <- 150
+RT_maximum <- 2000
+
+## Threshold of OOR observations before the individual is excluded
+exclude_prop <- 0.2
+
+participants_to_remove_oor <- RT_data_BLP %>%
+  filter(type == 1, acc == 1) %>% 
+  group_by(ID) %>% 
+  summarise(prop_oor = mean(RT < RT_minimum | RT > RT_maximum)) %>% 
+  filter(prop_oor > exclude_prop) %>% 
+  pull(ID)
+
+
+participants_to_remove <- c(participants_to_remove_acc, participants_to_remove_oor) %>% 
+  as.numeric()
+
+
+RT_data_BLP_word_filtered <- RT_data_BLP %>% 
+  filter(type == 1, acc == 1,!(ID %in% participants_to_remove), RT > RT_minimum, 
+         RT < RT_maximum)
+
+saveRDS(RT_data_BLP_word_filtered, "Output/BLP_single_trial.rds")
+write.csv(RT_data_BLP_word_filtered, "Output/BLP_single_trial.csv")
+
+## process and save mRT data
+
+mRT_data <- RT_data_BLP_word_filtered %>% 
+  group_by(word) %>% 
+  summarise(mRT = mean(RT))
+
+saveRDS(mRT_data, "Output/BLP.rds")
+write.csv(mRT_data, "Output/BLP.csv")
