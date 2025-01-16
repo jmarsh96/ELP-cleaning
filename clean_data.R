@@ -216,9 +216,18 @@ write.csv(RT_data_BLP_word_filtered, "Output/BLP_single_trial.csv")
 
 ## process and save mRT data
 
+BLP_accuracy <- RT_data_BLP %>% 
+  filter(type == 1,!(ID %in% participants_to_remove), RT > RT_minimum, 
+  RT < RT_maximum) %>% 
+  group_by(word) %>% 
+  summarise(acc = mean(acc))
+
 mRT_data <- RT_data_BLP_word_filtered %>% 
   group_by(word) %>% 
-  summarise(mRT = mean(RT))
+  summarise(mRT = mean(RT)) %>% 
+  left_join(BLP_accuracy, by = "word")
 
 saveRDS(mRT_data, "Output/BLP.rds")
 write.csv(mRT_data, "Output/BLP.csv")
+
+
