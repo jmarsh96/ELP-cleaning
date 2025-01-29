@@ -1,4 +1,4 @@
-# ELP-cleaning
+# LP-cleaning
 Data cleaning for the English Lexicon Project [1]. Here the raw LDT files are processed into the following outputs:
 
 * ELP_individual_level - Contains the raw LDT files appropriately combined
@@ -11,8 +11,14 @@ The precise data cleaning steps applied are as follows. Firstly, we pull togethe
 
 Next, we proceed to clean the data using the following steps. We set an accuracy threshold of $\alpha = 0.6$ whereby we are prepared to remove any participant who achieves an accuracy score lower than the threshold. In addition, we define the minimum and maximum RT thresholds as $RT_{\min} = 150$ and $RT_{\max} = 2000$ respectively and proceed to calculate the proportion of responses that are out of this range for each participant. Participants that have this proportion greater than $\beta = 0.2$ are also removed from the analysis. Once we filter the data set and remove all participants identified above, we then remove any observation outside of the acceptable range.
 
+The British Lexicon Project (BLP) data [2] was cleaned using the exact same process. The raw BLP files were processed into the following outputs:
+
+* BLP_individual_level - Contains the raw BLP files appropriately combined
+* BLP_single_trial - Contains the individual level data that has been cleaned (see below)
+* BLP - Contains the mean response time data for each word
 
 [1] Balota, D. A., Yap, M. J., Cortese, M. J., Hutchison, K. A., Kessler, B., Loftis, B., Neely, J. H., Nelson, D. L., Simpson, G. B., & Treiman, R. (2007). The English Lexicon Project. Behavior Research Methods, 39, 445-459.
+[2] Keuleers, E., Lacey, P., Rastle, K., & Brysbaert, M. (2012). The British Lexicon Project: Lexical decision data for 28,730 monosyllabic and disyllabic English words. Behavior Research Methods, 44, 287-304.
 
 
 
