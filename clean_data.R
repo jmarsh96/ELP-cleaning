@@ -106,7 +106,6 @@ RT_data <- map(part_data_list, ~ .x %>% `[[`("RT_data")) %>%
 
 if(!dir.exists("Output/")) dir.create("Output/")
 
-saveRDS(RT_data, "Output/ELP_individual_level.rds")
 write.csv(RT_data, "Output/ELP_individual_level.csv")
 
 
@@ -149,17 +148,22 @@ RT_data_word_filtered <- RT_data %>%
 
 ## Save cleaned individual level data as ELP-single-trial
 
-saveRDS(RT_data_word_filtered, "Output/ELP_single_trial.rds")
 write.csv(RT_data_word_filtered, "Output/ELP_single_trial.csv")
 
 
 ## process and save mRT data
+ELP_accuracy = RT_data %>%
+  filter(type == 1,!(ID %in% participants_to_remove), RT > RT_minimum, 
+  RT < RT_maximum) %>% 
+  group_by(word) %>% 
+  summarise(accuracy = mean(acc))
 
 mRT_data <- RT_data_word_filtered %>% 
   group_by(word) %>% 
-  summarise(mRT = mean(RT))
+  summarise(mRT = mean(RT)) %>% 
+  left_join(ELP_accuracy, by = "word")
 
-saveRDS(mRT_data, "Output/ELP.rds")
+
 write.csv(mRT_data, "Output/ELP.csv")
 
 
@@ -175,7 +179,7 @@ RT_data_BLP <- read.delim("blp_raw/blp-trials.txt",sep="\t") %>%
          type = factor(type, labels=c(0,1)),
          ID = as.factor(ID))
 
-
+write.csv(RT_data_BLP, "Output/BLP_individual_level.csv")
 
 ## Now filter and remove any non-words and clean the individual level data
 participant_accuracy <- RT_data_BLP %>%
@@ -188,12 +192,6 @@ participants_to_remove_acc <- participant_accuracy %>%
   filter(accuracy < accuracy_threshold) %>% 
   pull(ID)
 
-## Remove all participants that have a high proporportion of out-of-range (OOR) responses
-RT_minimum <- 150
-RT_maximum <- 2000
-
-## Threshold of OOR observations before the individual is excluded
-exclude_prop <- 0.2
 
 participants_to_remove_oor <- RT_data_BLP %>%
   filter(type == 1, acc == 1) %>% 
@@ -211,7 +209,7 @@ RT_data_BLP_word_filtered <- RT_data_BLP %>%
   filter(type == 1, acc == 1,!(ID %in% participants_to_remove), RT > RT_minimum, 
          RT < RT_maximum)
 
-saveRDS(RT_data_BLP_word_filtered, "Output/BLP_single_trial.rds")
+
 write.csv(RT_data_BLP_word_filtered, "Output/BLP_single_trial.csv")
 
 ## process and save mRT data
@@ -227,7 +225,6 @@ mRT_data <- RT_data_BLP_word_filtered %>%
   summarise(mRT = mean(RT)) %>% 
   left_join(BLP_accuracy, by = "word")
 
-saveRDS(mRT_data, "Output/BLP.rds")
 write.csv(mRT_data, "Output/BLP.csv")
 
 
