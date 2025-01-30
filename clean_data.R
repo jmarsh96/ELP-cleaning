@@ -167,9 +167,12 @@ mRT_data <- RT_data_word_filtered %>%
 write.csv(mRT_data, "Output/ELP.csv", row.names = FALSE)
 
 
+
 ####
 #### now clean BLP data using same process
 ####
+RT_data_BLP %>% 
+  filter(word == "abbés")
 
 
 RT_data_BLP <- read.delim("blp_raw/blp-trials.txt",sep="\t") %>% 
