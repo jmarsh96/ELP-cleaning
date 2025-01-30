@@ -106,7 +106,7 @@ RT_data <- map(part_data_list, ~ .x %>% `[[`("RT_data")) %>%
 
 if(!dir.exists("Output/")) dir.create("Output/")
 
-write.csv(RT_data, "Output/ELP_individual_level.csv")
+write.csv(RT_data, "Output/ELP_individual_level.csv", row.names = FALSE)
 
 
 ## Now filter and remove any non-words and clean the individual level data
@@ -179,7 +179,7 @@ RT_data_BLP <- read.delim("blp_raw/blp-trials.txt",sep="\t") %>%
          type = factor(type, labels=c(0,1)),
          ID = as.factor(ID))
 
-write.csv(RT_data_BLP, "Output/BLP_individual_level.csv")
+write.csv(RT_data_BLP, "Output/BLP_individual_level.csv", row.names = FALSE)
 
 ## Now filter and remove any non-words and clean the individual level data
 participant_accuracy <- RT_data_BLP %>%
@@ -210,7 +210,7 @@ RT_data_BLP_word_filtered <- RT_data_BLP %>%
          RT < RT_maximum)
 
 
-write.csv(RT_data_BLP_word_filtered, "Output/BLP_single_trial.csv")
+write.csv(RT_data_BLP_word_filtered, "Output/BLP_single_trial.csv", row.names = FALSE)
 
 ## process and save mRT data
 
@@ -225,6 +225,6 @@ mRT_data <- RT_data_BLP_word_filtered %>%
   summarise(mRT = mean(RT)) %>% 
   left_join(BLP_accuracy, by = "word")
 
-write.csv(mRT_data, "Output/BLP.csv")
+write.csv(mRT_data, "Output/BLP.csv", row.names = FALSE)
 
 
