@@ -148,7 +148,7 @@ RT_data_word_filtered <- RT_data %>%
 
 ## Save cleaned individual level data as ELP-single-trial
 
-write.csv(RT_data_word_filtered, "Output/ELP_single_trial.csv")
+write.csv(RT_data_word_filtered, "Output/ELP_single_trial.csv", row.names = FALSE)
 
 
 ## process and save mRT data
@@ -164,7 +164,7 @@ mRT_data <- RT_data_word_filtered %>%
   left_join(ELP_accuracy, by = "word")
 
 
-write.csv(mRT_data, "Output/ELP.csv")
+write.csv(mRT_data, "Output/ELP.csv", row.names = FALSE)
 
 
 ####
